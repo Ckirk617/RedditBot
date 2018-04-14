@@ -24,24 +24,22 @@ reddit = praw.Reddit(username = config.username,
 conn = psycopg2.connect(dbname='redditbot', user='postgres')
 cur = conn.cursor()
 
-"""Function below will retrieve some basic information from a given subreddit
-This function accesses the 'new' category but we can also access
-hot,guilded,controversial,new,rising,top"""
+"""Automated bot that checks reddit.com/r/new every ten seconds and
+adds the title and url of each posts to a postgres database"""
 
 
 def store_new_posts():
     counter = 1
     while True: 
-        for submission in reddit.subreddit('all').new(limit=3):
+        for submission in reddit.subreddit('all').new(limit=10):
             remove_char=submission.title.replace("'","")
-            sql_command = "INSERT INTO new_posts (title,url) VALUES ('%s','%s');" % (remove_char,submission.url)
-            print(sql_command)
+            sql_command = "INSERT INTO new_posts (id,title,url) VALUES ('%d','%s','%s');" % (counter,remove_char,submission.url)
             cur.execute(sql_command)
             conn.commit()
             counter += 1
-    print("sleeping for 10 seconds")
-    time.sleep(10)
-
+        print("sleeping for 30 seconds")
+        time.sleep(30)
+        
 
 
 store_new_posts()
