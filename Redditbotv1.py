@@ -43,7 +43,7 @@ def store_new_posts():
 
 def find_coffee_posts():
     while True:
-        for submission in reddit.subreddit('coffee').new(limit=10):
+        for submission in reddit.subreddit('all').new(limit=10):
             x=submission.title.lower()
             if x.find('the') != -1:
                 print("Found Coffee Post!")
