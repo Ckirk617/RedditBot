@@ -8,7 +8,12 @@ Created on Wed Apr 11 10:32:23 2018
 login credits for our reddit bot
 """
 
-username = "naddycat"
-password = "metallicayo"
-client_id = "R4cVOBfzYNjMbg" 
-client_secret = "eLbBzRasTxbSKm9M0oFXtbLFv30" 
+username = "DataMonger617"
+password = "EspressoChild617"
+client_id = "5cHnDMrVn8B6Pg" 
+client_secret = "GlDjeaNspv3UYNkwafSEydQ6Lg0" 
+
+
+""" 
+redirect url: http://localhost:8080
+"""

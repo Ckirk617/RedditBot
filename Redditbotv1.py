@@ -13,13 +13,14 @@ import praw
 import config
 import time
 import psycopg2
+import datetime
 
 
 reddit = praw.Reddit(username = config.username,
                 password = config.password,
                 client_id = config.client_id,
                 client_secret = config.client_secret,
-                user_agent = "naddy's comment reader test v0.1")
+                user_agent = "DataMonger's bot")
 
 conn = psycopg2.connect(dbname='redditbot', user='postgres')
 cur = conn.cursor()
@@ -39,7 +40,19 @@ def store_new_posts():
             counter += 1
         print("sleeping for 30 seconds")
         time.sleep(30)
-        
 
+def find_coffee_posts():
+    while True:
+        for submission in reddit.subreddit('coffee').new(limit=10):
+            x=submission.title.lower()
+            if x.find('the') != -1:
+                print("Found Coffee Post!")
+                remove_char=submission.title.replace("'","")    
+                sql_command = "INSERT INTO coffee_posts (date,title,url) VALUES ('%s','%s','%s');" % (datetime.datetime.now(),remove_char,submission.url)
+                cur.execute(sql_command)
+                conn.commit()
+            else:
+                print("No posts found")
+        time.sleep(60*5)
 
-store_new_posts()
+find_coffee_posts()
