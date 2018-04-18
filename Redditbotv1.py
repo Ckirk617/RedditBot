@@ -60,19 +60,15 @@ def find_coffee_posts():
         time.sleep(30)
 
 def rcoffee_collection():
+    """Automated bot that scans r/coffee and adds submission title, score, and url to postgresql database"""
     while True:
-        for submission in reddit.subreddit('coffee').new(limit=1):
-            last_post = ''
-            if submission.url != last_post:
-                remove_char=submission.title.replace("'","")    
-                sql_command = "INSERT INTO rcoffee_posts (date,title,url) VALUES ('%s','%s','%s');" % (datetime.datetime.now(),remove_char,submission.url)
-                cur.execute(sql_command)
-                conn.commit()
-                last_post = submission.url
-                print('adding post to database')
-            else:
-                print('Repeated Post. Sleeping for 3 seconds')
-            time.sleep(3)
+        for submission in reddit.subreddit('coffee').hot(limit=30):
+            remove_char=submission.title.replace("'","")    
+            sql_command = "INSERT INTO rcoffee_posts (title,score,url) VALUES ('%s','%d','%s');" % (remove_char,submission.score,submission.url)
+            cur.execute(sql_command)
+            conn.commit()
+            print('adding post ' + str(submission.title))
+            time.sleep(1)
 
 
 rcoffee_collection()
