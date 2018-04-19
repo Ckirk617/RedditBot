@@ -30,17 +30,15 @@ cur = conn.cursor()
 
 def store_new_posts():
     """Automated bot that checks reddit.com/r/all/new every ten seconds and
-    adds the title and url of each posts to a postgres database"""
-    counter = 1
+    adds the title and url of each posts to a postgres database called "new_posts" """
     while True: 
         for submission in reddit.subreddit('all').new(limit=10):
-            remove_char=submission.title.replace("'","")
-            sql_command = "INSERT INTO new_posts (id,title,url) VALUES ('%d','%s','%s');" % (counter,remove_char,submission.url)
-            cur.execute(sql_command)
+            title=str(submission.title.replace("'",""))
+            sql_command = "INSERT INTO new_posts (title,url) VALUES (%s,%s);"
+            cur.execute(sql_command,(title,submission.url))
             conn.commit()
-            counter += 1
-        print("sleeping for 30 seconds")
-        time.sleep(30)
+        print("sleeping for 20 seconds")
+        time.sleep(20)
 
 def find_coffee_posts():
     """Automated bot that checks reddit.com/r/all/new every ten seconds for posts whose
@@ -51,9 +49,9 @@ def find_coffee_posts():
             x=submission.title.lower()
             if x.find('coffee') != -1:
                 print("Found Coffee Post!")
-                remove_char=submission.title.replace("'","")    
-                sql_command = "INSERT INTO coffee_posts (date,title,url) VALUES ('%s','%s','%s');" % (datetime.datetime.now(),remove_char,submission.url)
-                cur.execute(sql_command)
+                title=str(submission.title.replace("'",""))    
+                sql_command = "INSERT INTO coffee_posts (date,title,url) VALUES (%s,%s,%s);" 
+                cur.execute(sql_command,(datetime.datetime.now(),title,submission.url))
                 conn.commit()
             else:
                 print("No posts found")
@@ -63,12 +61,14 @@ def rcoffee_collection():
     """Automated bot that scans r/coffee and adds submission title, score, and url to postgresql database"""
     while True:
         for submission in reddit.subreddit('coffee').hot(limit=30):
-            remove_char=submission.title.replace("'","")    
-            sql_command = "INSERT INTO rcoffee_posts (title,score,url) VALUES ('%s','%d','%s');" % (remove_char,submission.score,submission.url)
-            cur.execute(sql_command)
+            title=str(submission.title.replace("'","")) 
+            score=submission.score
+            url=str(submission.url)
+            sql_command = "INSERT INTO rcoffee_posts (title,score,url) VALUES (%s,%s,%s);"
+            cur.execute(sql_command,(title,score,url))
             conn.commit()
             print('adding post ' + str(submission.title))
-            time.sleep(1)
+            time.sleep(20)
 
 
-rcoffee_collection()
+store_new_posts()
