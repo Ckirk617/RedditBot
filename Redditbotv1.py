@@ -25,6 +25,24 @@ reddit = praw.Reddit(username = config.username,
 conn = psycopg2.connect(dbname='redditbot', user='postgres')
 cur = conn.cursor()
 
+def check_posts(subreddit_name,limit_to_check=10,sleep_time=30):
+    """
+    Function that takes:
+        subreddit_name: a string containing the name of the desired subreddit to check
+        category: a string containing the desired category of posts - valid
+                  arguments are 'new','hot','top','controversial','rising','gilded'
+        limit_to_check: an integer containing the desired number of posts to check
+                        default at 10 posts
+        sleep_time: an integer representing the number of seconds to wait before
+                    loop repeats and checking occurs again. Default at 30 seconds.
+    
+    Prints the title names of the captured results
+    """
+    while True: 
+        for submission in reddit.subreddit(subreddit_name).new(limit=limit_to_check):
+            print(submission.title)
+        print("sleeping for" + " " + str(sleep_time) + " " +  "seconds")
+        time.sleep(sleep_time)
 
 
 
@@ -68,7 +86,7 @@ def rcoffee_collection():
             cur.execute(sql_command,(title,score,url))
             conn.commit()
             print('adding post ' + str(submission.title))
-            time.sleep(20)
+            time.sleep(2)
 
 
-store_new_posts()
+check_posts('all',50)
